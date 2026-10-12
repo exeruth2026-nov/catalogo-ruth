@@ -8,38 +8,40 @@
     html { scroll-behavior: smooth; }
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .bounce-in { animation: bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes bounce { 0% { transform: scale(0); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
   </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 font-sans pb-24"> 
 
-  <header class="bg-gray-900 text-white text-center p-5 md:p-6 shadow-md">
-    <h1 class="text-2xl md:text-3xl font-black uppercase tracking-widest text-pink-500">SOY RUTH <span class="text-white">NOVEDADES</span></h1>
-    <p class="text-xs md:text-sm mt-2 text-gray-300">Los mejores productos CALIDAD-PRECIO • Envíos a todo el país</p>
+  <header class="bg-gray-900 text-white text-center p-4 md:p-6 shadow-md">
+    <h1 class="text-xl md:text-3xl font-black uppercase tracking-widest text-pink-500">SOY RUTH <span class="text-white">NOVEDADES</span></h1>
+    <p class="text-[10px] md:text-sm mt-1 text-gray-300">Los mejores productos CALIDAD-PRECIO • Envíos a todo el país</p>
   </header>
 
-  <main class="max-w-7xl mx-auto p-3 md:p-4 mt-4">
+  <main class="max-w-7xl mx-auto p-2 md:p-4 mt-2">
     
-    <div class="mb-4 relative hidden" id="caja-buscador">
-      <input type="text" id="buscador" placeholder="🔍 Buscar producto o marca..." 
-             class="w-full p-3 md:p-4 rounded-xl border border-gray-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none shadow-sm text-base md:text-lg transition-all">
+    <div class="mb-3 relative hidden" id="caja-buscador">
+      <input type="text" id="buscador" placeholder="🔍 Buscar producto, marca o código SKU..." 
+             class="w-full p-2 md:p-3 rounded-lg border border-gray-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none shadow-sm text-sm md:text-base transition-all">
     </div>
 
-    <div id="cargando" class="text-center text-gray-500 font-semibold text-lg py-10 animate-pulse">
+    <div id="cargando" class="text-center text-gray-500 font-semibold text-sm py-10 animate-pulse">
       Cargando novedades...
     </div>
     
-    <div class="flex flex-col md:flex-row-reverse gap-6 hidden" id="contenido-principal">
+    <div class="flex flex-col md:flex-row-reverse gap-4 hidden" id="contenido-principal">
       
-      <aside class="w-full md:w-1/4 z-10 sticky top-2 md:top-6">
-        <div class="bg-white p-3 md:p-5 rounded-xl shadow border border-gray-200">
-          <h3 class="hidden md:block text-xl font-bold text-gray-800 mb-4 uppercase border-b-2 border-pink-500 pb-1">CATEGORÍAS</h3>
+      <aside class="w-full md:w-1/4 z-10 sticky top-2 md:top-4">
+        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+          <h3 class="hidden md:block text-lg font-bold text-gray-800 mb-3 uppercase border-b-2 border-pink-500 pb-1">CATEGORÍAS</h3>
           
-          <button onclick="const menu = document.getElementById('lista-categorias'); menu.classList.toggle('hidden'); menu.classList.toggle('flex');" class="md:hidden w-full flex justify-between items-center text-sm font-bold text-pink-600 uppercase border-b-2 border-pink-500 pb-2 outline-none">
+          <button onclick="const menu = document.getElementById('lista-categorias'); menu.classList.toggle('hidden'); menu.classList.toggle('flex');" class="md:hidden w-full flex justify-between items-center text-xs font-bold text-pink-600 uppercase border-b border-pink-500 pb-2 outline-none">
             <span>📁 Filtrar por Categoría</span>
             <span>▼</span>
           </button>
 
-          <ul id="lista-categorias" class="hidden md:flex flex-col gap-2 text-sm font-semibold text-gray-600 mt-3 md:mt-0 max-h-64 overflow-y-auto md:max-h-full scrollbar-hide">
+          <ul id="lista-categorias" class="hidden md:flex flex-col gap-1 text-xs font-semibold text-gray-600 mt-2 md:mt-0 max-h-64 overflow-y-auto md:max-h-full scrollbar-hide">
           </ul>
         </div>
       </aside>
@@ -51,22 +53,30 @@
     </div>
   </main>
 
+  <!-- CARRITO FLOTANTE -->
+  <div id="carrito-flotante" class="hidden fixed bottom-4 right-4 left-4 md:left-auto z-50 bounce-in">
+    <button onclick="enviarCarrito()" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-black text-sm md:text-base py-3 px-6 rounded-full shadow-2xl border-2 border-white flex items-center justify-center gap-2 transition-transform active:scale-95">
+      🛒 <span id="txt-carrito-flotante">Enviar Carrito (0)</span>
+    </button>
+  </div>
+
   <script>
-    let todosLosProductos = []; 
-    
     // 🔴 PEGA TU URL DE APPS SCRIPT AQUÍ 🔴
     const urlAPI = 'https://script.google.com/macros/s/AKfycbwMDuluV49m9ThpcdHDYt-bto_WhoqSJrJ3ZNd-0qrkhHTWG7ZX-9K4KikyjK-YSaDh/exec';
+    
+    let todosLosProductos = []; 
+    let productosEnPantalla = [];
+    let carrito = []; 
 
-    // Ahora hacemos un "fetch" para traer los datos desde afuera
     fetch(urlAPI)
       .then(response => response.json())
       .then(data => iniciarCatalogo(data))
       .catch(error => mostrarError(error));
 
     function mostrarError(error) {
-      const msj = error && error.message ? error.message : "Error desconocido de conexión.";
+      const msj = error && error.message ? error.message : "Error de conexión.";
       document.getElementById('cargando').innerHTML = "❌ ERROR: " + msj;
-      document.getElementById('cargando').className = "text-center text-red-600 font-bold text-xl py-10";
+      document.getElementById('cargando').className = "text-center text-red-600 font-bold text-lg py-10";
     }
 
     function iniciarCatalogo(productos) {
@@ -79,7 +89,8 @@
         document.getElementById('contenido-principal').classList.remove('hidden');
         document.getElementById('caja-buscador').classList.remove('hidden');
         todosLosProductos = productos;
-        renderizarPantalla(todosLosProductos); 
+        productosEnPantalla = productos;
+        renderizarPantalla(); 
       } catch (e) {
         mostrarError(e);
       }
@@ -88,30 +99,85 @@
     document.getElementById('buscador').addEventListener('input', function(e) {
       const texto = e.target.value.toLowerCase().trim();
       if(texto === "") {
-        renderizarPantalla(todosLosProductos);
+        productosEnPantalla = todosLosProductos;
+        renderizarPantalla();
         return;
       }
-      const filtrados = todosLosProductos.filter(prod => {
+      productosEnPantalla = todosLosProductos.filter(prod => {
         const pNombre = String(prod.nombre || "").toLowerCase();
         const pMarca = String(prod.marca || "").toLowerCase();
         const pDesc = String(prod.descripcion || "").toLowerCase();
-        return pNombre.includes(texto) || pMarca.includes(texto) || pDesc.includes(texto);
+        const pSku = String(prod.sku || "").toLowerCase();
+        return pNombre.includes(texto) || pMarca.includes(texto) || pDesc.includes(texto) || pSku.includes(texto);
       });
-      renderizarPantalla(filtrados);
+      renderizarPantalla();
     });
 
-    function renderizarPantalla(productosRender) {
+    function toggleCarrito(indexOriginal) {
+      const prod = todosLosProductos[indexOriginal];
+      const indexEnCarrito = carrito.findIndex(item => item.index === indexOriginal);
+      
+      if (indexEnCarrito > -1) {
+        carrito.splice(indexEnCarrito, 1); 
+      } else {
+        let precioFinal = prod.oferta > 0 ? prod.oferta : prod.precio;
+        carrito.push({ index: indexOriginal, nombre: prod.nombre, marca: prod.marca, sku: prod.sku, precio: precioFinal });
+      }
+      
+      actualizarBotonFlotante();
+      renderizarPantalla(); 
+    }
+
+    function actualizarBotonFlotante() {
+      const btnFlotante = document.getElementById('carrito-flotante');
+      const txtFlotante = document.getElementById('txt-carrito-flotante');
+      if (carrito.length > 0) {
+        btnFlotante.classList.remove('hidden');
+        let total = carrito.reduce((sum, item) => sum + item.precio, 0);
+        txtFlotante.innerText = `Enviar Carrito (${carrito.length}) - $${total.toLocaleString('es-AR')}`;
+      } else {
+        btnFlotante.classList.add('hidden');
+      }
+    }
+
+    function enviarCarrito() {
+      if (carrito.length === 0) return;
+      let msj = "Hola Soy Ruth Novedades 👋\nQuiero pedir esto:\n\n";
+      let total = 0;
+      
+      if (carrito.length === 1) {
+        // Formato detallado para 1 solo producto
+        let item = carrito[0];
+        msj += `📦 *${item.nombre}*\n🏷️ Marca: ${item.marca} | Código: ${item.sku}\n💲 $${item.precio.toLocaleString('es-AR')}\n\n`;
+        total = item.precio;
+      } else {
+        // MODO AHORRO DE CARACTERES para Varios Productos (Primera Letra + SKU)
+        carrito.forEach(item => {
+          let primeraLetra = item.nombre.charAt(0).toUpperCase();
+          let textoSku = item.sku && item.sku !== "S/N" ? item.sku : "SinCod";
+          msj += `📦 ${primeraLetra}-${textoSku} | $${item.precio.toLocaleString('es-AR')}\n`;
+          total += item.precio;
+        });
+        msj += "\n";
+      }
+      
+      msj += `*Total estimado:* $${total.toLocaleString('es-AR')}\n\n¿Tienen envío a...?`;
+      let linkWsp = "https://wa.me/5493885122621?text=" + encodeURIComponent(msj);
+      window.open(linkWsp, '_blank');
+    }
+
+    function renderizarPantalla() {
       const contenedor = document.getElementById('contenedor-catalogo');
       const menuCategorias = document.getElementById('lista-categorias');
 
-      if(productosRender.length === 0) {
-        contenedor.innerHTML = '<div class="text-center py-10 bg-white rounded-xl shadow border border-gray-200"><p class="text-lg text-gray-600 font-bold mb-2">No encontramos coincidencias 😅</p></div>';
+      if(productosEnPantalla.length === 0) {
+        contenedor.innerHTML = '<div class="text-center py-10 bg-white rounded-lg shadow-sm border border-gray-200"><p class="text-sm text-gray-600 font-bold mb-2">No encontramos coincidencias 😅</p></div>';
         menuCategorias.innerHTML = '<li class="text-center text-gray-400">Sin resultados</li>';
         return;
       }
 
       const catalogoAgrupado = {};
-      productosRender.forEach(prod => {
+      productosEnPantalla.forEach(prod => {
         let cat = String(prod.categoria || "Otras");
         if(!catalogoAgrupado[cat]) catalogoAgrupado[cat] = { "DISPONIBLE": [], "RESERVADO": [], "VENDIDO": [] };
         let est = String(prod.estado || "DISPONIBLE");
@@ -128,13 +194,13 @@
         
         htmlMenu += `<li>
           <a href="#${catId}" onclick="if(window.innerWidth < 768) { document.getElementById('lista-categorias').classList.add('hidden'); document.getElementById('lista-categorias').classList.remove('flex'); }" 
-             class="block px-4 py-2 md:px-0 md:py-1 bg-pink-50 md:bg-transparent rounded-lg md:rounded-none hover:text-pink-600 transition-colors border border-pink-100 md:border-none w-full text-left">
+             class="block px-2 py-1.5 md:px-0 md:py-1 bg-pink-50 md:bg-transparent rounded md:rounded-none hover:text-pink-600 transition-colors border border-pink-100 md:border-none w-full text-left">
             👉 ${categoria}
           </a>
         </li>`;
         
-        htmlFinal += `<div id="${catId}" class="pt-2 md:pt-6"></div>`; 
-        htmlFinal += `<h2 class="text-xl md:text-3xl font-black text-gray-800 mt-2 mb-4 border-b-4 border-pink-500 inline-block uppercase">${categoria}</h2>`;
+        htmlFinal += `<div id="${catId}" class="pt-2 md:pt-4"></div>`; 
+        htmlFinal += `<h2 class="text-lg md:text-2xl font-black text-gray-800 mt-1 mb-3 border-b-2 border-pink-500 inline-block uppercase">${categoria}</h2>`;
         
         const ordenEstados = [
           { clave: "DISPONIBLE", color: "text-green-600", icono: "🟢" },
@@ -146,52 +212,87 @@
           const listaProd = catalogoAgrupado[categoria][objEstado.clave];
           
           if(listaProd && listaProd.length > 0) {
-            htmlFinal += `<h3 class="text-base font-bold ${objEstado.color} mb-3 mt-2 md:ml-2 border-l-4 border-current pl-2 shadow-sm bg-white inline-block pr-3 py-1 rounded">${objEstado.icono} ${objEstado.clave}S</h3>`;
-            htmlFinal += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">`;
+            htmlFinal += `<h3 class="text-xs font-bold ${objEstado.color} mb-2 mt-1 md:ml-1 border-l-2 border-current pl-2 shadow-sm bg-white inline-block pr-2 py-0.5 rounded">${objEstado.icono} ${objEstado.clave}S</h3>`;
+            htmlFinal += `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 mb-6">`;
             
             listaProd.forEach(prod => {
+              let indexReal = todosLosProductos.findIndex(p => p.nombre === prod.nombre && p.descripcion === prod.descripcion);
+              let estaEnCarrito = carrito.some(item => item.index === indexReal);
+
               let pNormal = parseFloat(prod.precio) || 0;
               let pOferta = parseFloat(prod.oferta) || 0;
               let htmlPrecio = "";
-              let txtWspPrecio = "";
+              let msjIndividualPrecio = "";
               
               if(pOferta > 0) {
-                htmlPrecio = `<span class="text-red-500 line-through text-xs md:text-sm font-bold mr-2 opacity-80">$${pNormal.toLocaleString('es-AR')}</span><span class="text-green-600 font-black text-2xl md:text-3xl tracking-tight">$${pOferta.toLocaleString('es-AR')}</span>`;
-                txtWspPrecio = `🔥 *OFERTA!* Precio normal $${pNormal} rebajado a *$${pOferta}*`;
+                htmlPrecio = `<span class="text-red-500 line-through text-[10px] md:text-xs font-bold mr-1 opacity-80">$${pNormal.toLocaleString('es-AR')}</span><span class="text-green-600 font-black text-sm md:text-lg tracking-tight">$${pOferta.toLocaleString('es-AR')}</span>`;
+                msjIndividualPrecio = `🔥 *OFERTA!* Precio normal $${pNormal} rebajado a *$${pOferta}*`;
               } else {
-                htmlPrecio = `<span class="text-gray-900 font-black text-2xl md:text-3xl tracking-tight">$${pNormal.toLocaleString('es-AR')}</span>`;
-                txtWspPrecio = `*Precio:* $${pNormal}`;
+                htmlPrecio = `<span class="text-gray-900 font-black text-sm md:text-lg tracking-tight">$${pNormal.toLocaleString('es-AR')}</span>`;
+                msjIndividualPrecio = `*Precio:* $${pNormal}`;
               }
 
               let htmlEnlaceRef = "";
               if(prod.enlaceRef && prod.enlaceRef.trim() !== "") {
                 let urlLimpia = prod.enlaceRef.trim();
                 if(!urlLimpia.startsWith("http")) urlLimpia = "https://" + urlLimpia;
-                htmlEnlaceRef = `<a href="${urlLimpia}" target="_blank" class="inline-flex items-center text-xs md:text-sm font-semibold text-pink-600 hover:text-pink-800 bg-pink-50 px-3 py-1 rounded-full mb-3 transition-colors border border-pink-200"><span>🔗 Ver Referencia Web</span></a>`;
+                htmlEnlaceRef = `<a href="${urlLimpia}" target="_blank" class="inline-block text-[9px] md:text-xs font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full mb-1 border border-pink-100 w-fit">🔗 Ref. Web</a>`;
               }
 
               let opacidad = (objEstado.clave === "VENDIDO") ? "opacity-60 grayscale" : "";
-              let btnWspFondo = (objEstado.clave === "DISPONIBLE") ? "bg-green-500 hover:bg-green-600" : "bg-gray-400 cursor-not-allowed pointer-events-none";
-              let btnWspTexto = (objEstado.clave === "DISPONIBLE") ? "Comprar por WhatsApp" : "No Disponible";
+              let esDisponible = objEstado.clave === "DISPONIBLE";
               
-              let msjWsp = encodeURIComponent(`Hola Soy Ruth Novedades 👋\nMe interesa este artículo:\n\n📦 *${prod.nombre}*\n🏷️ Marca: *${prod.marca}*\n💲 ${txtWspPrecio}`);
-              let linkWsp = "https://wa.me/5493885122621?text=" + msjWsp; 
+              let htmlBotones = "";
+              if (esDisponible) {
+                if (estaEnCarrito) {
+                  htmlBotones = `
+                    <button onclick="toggleCarrito(${indexReal})" class="w-full text-xs font-bold text-gray-500 bg-gray-100 py-1 mb-1 rounded hover:bg-gray-200">❌ Quitar</button>
+                    <button onclick="enviarCarrito()" class="w-full bg-green-500 text-white font-bold text-[10px] md:text-xs py-2 rounded shadow-sm flex items-center justify-center gap-1 animate-pulse">
+                      ✅ COMPRAR CARRITO
+                    </button>
+                  `;
+                } else {
+                  let msjWspSolo = encodeURIComponent(`Hola Soy Ruth Novedades 👋\nMe interesa este artículo:\n\n📦 *${prod.nombre}*\n🏷️ Marca: *${prod.marca}* | Código: ${prod.sku}\n💲 ${msjIndividualPrecio}`);
+                  let linkWspSolo = "https://wa.me/5493885122621?text=" + msjWspSolo; 
+                  
+                  htmlBotones = `
+                    <button onclick="toggleCarrito(${indexReal})" class="w-full text-[10px] md:text-xs font-bold text-pink-600 bg-pink-50 border border-pink-200 py-1 mb-1 rounded hover:bg-pink-100 transition-colors">🛒 Seleccionar</button>
+                    <a href="${linkWspSolo}" target="_blank" class="block text-center w-full bg-gray-800 text-white font-bold text-[10px] md:text-xs py-2 rounded shadow-sm hover:bg-gray-900 transition-colors">Comprar solo este</a>
+                  `;
+                }
+              } else {
+                htmlBotones = `<div class="text-center w-full bg-gray-300 text-gray-500 font-bold text-[10px] py-2 rounded cursor-not-allowed">No Disponible</div>`;
+              }
 
               htmlFinal += `
-                <div class="bg-white rounded-xl md:rounded-2xl shadow-sm md:shadow-md overflow-hidden flex flex-col justify-between border border-gray-200 transition duration-300 hover:shadow-lg ${opacidad}">
-                  <div class="h-48 md:h-56 bg-white flex items-center justify-center overflow-hidden relative border-b border-gray-100 p-2">
-                    ${prod.foto ? `<img src="${prod.foto}" alt="${prod.nombre}" class="w-full h-full object-contain rounded-lg">` : `<span class="text-gray-300 font-medium text-4xl">📸</span>`}
-                    <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-gray-900/80 backdrop-blur-sm text-white text-[10px] md:text-xs font-bold px-2 py-1 md:px-3 md:py-1.5 rounded-full shadow border border-gray-700">📦 Stock: ${prod.stock}</div>
+                <div class="bg-white rounded-lg shadow border border-gray-200 flex flex-col justify-between overflow-hidden transition-all hover:shadow-md ${opacidad} ${estaEnCarrito ? 'ring-2 ring-green-400' : ''}">
+                  
+                  <div class="h-28 md:h-36 bg-white flex items-center justify-center overflow-hidden relative border-b border-gray-100 p-1">
+                    ${prod.foto ? `<img src="${prod.foto}" alt="${prod.nombre}" class="w-full h-full object-contain rounded">` : `<span class="text-gray-300 text-2xl">📸</span>`}
+                    <div class="absolute top-1 right-1 bg-gray-900/80 backdrop-blur-sm text-white text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded shadow">Stock: ${prod.stock}</div>
                   </div>
-                  <div class="p-3 md:p-5 flex-grow bg-gray-50/30">
-                    <p class="text-[10px] md:text-xs font-bold text-pink-700 mb-1 md:mb-2 uppercase tracking-wider bg-pink-50 inline-block px-2 py-0.5 rounded border border-pink-200 shadow-sm">${prod.marca}</p>
-                    <h2 class="text-base md:text-lg font-bold text-gray-800 leading-tight mb-2">${prod.nombre}</h2>
-                    <button onclick="const desc = this.nextElementSibling; desc.classList.toggle('hidden'); this.innerText = desc.classList.contains('hidden') ? '👇 Ver características' : '👆 Ocultar características';" class="text-left text-sm font-bold text-pink-600 bg-pink-50 hover:bg-pink-100 rounded-lg w-full py-1.5 px-3 mb-2 transition-colors border border-pink-100 outline-none">👇 Ver características</button>
-                    <div class="hidden text-gray-600 text-xs md:text-sm mb-3 bg-white p-3 rounded-lg border border-gray-200 shadow-inner whitespace-pre-line leading-relaxed">${prod.descripcion}</div>
-                    <div class="mt-2 pt-3 md:pt-4 border-t border-gray-200 flex flex-col">${htmlEnlaceRef}<div class="flex items-end">${htmlPrecio}</div></div>
+
+                  <div class="p-2 flex-grow bg-gray-50/30 flex flex-col">
+                    
+                    <!-- MARCA A LA IZQUIERDA Y SKU A LA DERECHA -->
+                    <div class="flex justify-between items-center mb-0.5">
+                      <p class="text-[9px] md:text-[10px] font-bold text-pink-700 bg-pink-50 border border-pink-100 px-1 rounded uppercase tracking-wide truncate max-w-[60%]">${prod.marca}</p>
+                      <span class="text-[9px] md:text-[10px] font-bold text-gray-400 truncate max-w-[35%] text-right">#${prod.sku}</span>
+                    </div>
+
+                    <h2 class="text-xs md:text-sm font-bold text-gray-800 leading-tight mb-1 line-clamp-2 h-8 md:h-10">${prod.nombre}</h2>
+                    
+                    <button onclick="const desc = this.nextElementSibling; desc.classList.toggle('hidden'); this.innerText = desc.classList.contains('hidden') ? '+ Info' : '- Info';" class="text-left text-[10px] font-bold text-gray-500 mb-1 outline-none underline">+ Info</button>
+                    <div class="hidden text-gray-600 text-[10px] mb-2 bg-white p-1.5 rounded border border-gray-200 shadow-inner whitespace-pre-line leading-snug">${prod.descripcion}</div>
+                    
+                    <div class="mt-auto pt-1 flex flex-col">
+                      ${htmlEnlaceRef}
+                      <div class="flex items-end">${htmlPrecio}</div>
+                    </div>
                   </div>
-                  <div class="bg-white p-3 md:p-4">
-                    <a href="${linkWsp}" target="_blank" class="block text-center w-full ${btnWspFondo} text-white font-bold text-base md:text-lg py-2.5 md:py-3 rounded-lg md:rounded-xl shadow transition-all active:scale-95">${btnWspTexto}</a>
+
+                  <div class="bg-white p-2 border-t border-gray-100">
+                    ${htmlBotones}
                   </div>
                 </div>
               `;
