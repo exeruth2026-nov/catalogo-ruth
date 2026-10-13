@@ -13,19 +13,41 @@
     .bounce-in { animation: bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     @keyframes bounce { 0% { transform: scale(0); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
     
-    /* Efecto "Latido" para el número de teléfono */
+    /* Efecto "Latido" para teléfono y etiquetas de urgencia */
     .latido-suave { animation: pulse 2s infinite; }
     
-    /* Animación de entrada en Cascada para los productos */
+    /* Animación de entrada en Cascada para productos */
     @keyframes fadeInUp {
       0% { opacity: 0; transform: translateY(30px); }
       100% { opacity: 1; transform: translateY(0); }
     }
     .card-animada {
       animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      opacity: 0; /* Inician invisibles hasta que la animación corre */
+      opacity: 0;
     }
     
+    /* ANIMACIÓN DEL TÍTULO: Choque Lateral sin tocarse */
+    @keyframes choqueIzquierda {
+      0% { transform: translateX(-150%); opacity: 0; }
+      15% { transform: translateX(0); opacity: 1; }
+      85% { transform: translateX(0); opacity: 1; }
+      100% { transform: translateX(-150%); opacity: 0; }
+    }
+    @keyframes choqueDerecha {
+      0% { transform: translateX(150%); opacity: 0; }
+      15% { transform: translateX(0); opacity: 1; }
+      85% { transform: translateX(0); opacity: 1; }
+      100% { transform: translateX(150%); opacity: 0; }
+    }
+    .anim-ruth {
+      display: inline-block;
+      animation: choqueIzquierda 5.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+    }
+    .anim-novedades {
+      display: inline-block;
+      animation: choqueDerecha 5.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+    }
+
     /* Fondo con patrón sutil en el header */
     .bg-patron {
       background-image: radial-gradient(#ec4899 1px, transparent 1px);
@@ -36,18 +58,19 @@
 </head>
 <body class="bg-gray-50 font-sans pb-24"> 
 
-  <!-- ENCABEZADO CREATIVO -->
-  <header class="bg-gray-900 text-white text-center p-5 md:p-8 shadow-2xl relative overflow-hidden">
-    <!-- Patrón de fondo decorativo -->
+  <!-- ENCABEZADO -->
+  <header class="bg-gray-900 text-white text-center p-5 md:p-8 shadow-2xl relative overflow-hidden flex flex-col items-center">
     <div class="absolute inset-0 bg-patron opacity-10"></div>
     
-    <div class="relative z-10">
-      <h1 class="text-3xl md:text-5xl font-black uppercase tracking-widest text-pink-500 drop-shadow-md">
-        SOY RUTH <span class="text-white">NOVEDADES</span>
+    <div class="relative z-10 w-full overflow-hidden">
+      <!-- El contenedor "flex gap-2" evita que los textos se toquen al juntarse -->
+      <h1 class="text-3xl md:text-5xl font-black uppercase tracking-widest drop-shadow-md flex justify-center gap-2 md:gap-3 py-2 w-full">
+        <span class="text-pink-500 anim-ruth">SOY RUTH</span>
+        <span class="text-white anim-novedades">NOVEDADES</span>
       </h1>
       
-      <!-- Número de Teléfono Gigante y Animado -->
-      <div class="mt-3 inline-flex items-center justify-center gap-2 bg-white/10 border border-pink-500/30 px-6 py-2 rounded-full latido-suave backdrop-blur-sm">
+      <!-- Número de Teléfono Gigante -->
+      <div class="mt-2 inline-flex items-center justify-center gap-2 bg-white/10 border border-pink-500/30 px-6 py-2 rounded-full latido-suave backdrop-blur-sm">
         <span class="text-2xl md:text-3xl">📲</span>
         <span class="text-xl md:text-3xl font-black text-pink-400 tracking-wider">3885122621</span>
       </div>
@@ -88,7 +111,6 @@
       <div class="w-full md:w-3/4">
         <div id="contenedor-catalogo"></div>
       </div>
-      
     </div>
   </main>
 
@@ -164,7 +186,7 @@
       }
       
       actualizarBotonFlotante();
-      renderizarPantalla(false); // Pasamos 'false' para no reiniciar las animaciones al hacer clic
+      renderizarPantalla(false);
     }
 
     function actualizarBotonFlotante() {
@@ -179,6 +201,7 @@
       }
     }
 
+    // LÓGICA DE MENSAJE CORREGIDA (Sin caracteres raros)
     function enviarCarrito() {
       if (carrito.length === 0) return;
       let msj = "Hola Soy Ruth Novedades 👋\nQuiero pedir esto:\n\n";
@@ -186,25 +209,27 @@
       
       if (carrito.length === 1) {
         let item = carrito[0];
-        msj += `📦 *${item.nombre}*\n🏷️ Marca: ${item.marca} | Código: ${item.sku}\n💲 $${item.precio.toLocaleString('es-AR')}\n\n`;
+        msj += "📦 *" + item.nombre + "*\n🏷️ Marca: " + item.marca + " | Código: " + item.sku + "\n💲 $" + item.precio.toLocaleString('es-AR') + "\n\n";
         total = item.precio;
       } else {
-        // MODO AHORRO: Primera Palabra + SKU
+        // Modo ahorro seguro (sin corchetes raros para evitar errores en móviles)
         carrito.forEach(item => {
-          let primeraPalabra = item.nombre.trim().split(/\s+/)[0].toUpperCase();
-          let textoSku = item.sku && item.sku !== "S/N" ? item.sku : "SinCod";
-          msj += `📦 ${primeraPalabra} [${textoSku}] \vert{}$${item.precio.toLocaleString('es-AR')}\n`;
+          let nombreLimpio = String(item.nombre).trim();
+          let arrayPalabras = nombreLimpio.split(" ");
+          let primeraPalabra = arrayPalabras.length > 0 ? arrayPalabras[0].toUpperCase() : "PROD";
+          let textoSku = (item.sku && item.sku !== "S/N") ? item.sku : "S/C";
+          
+          msj += "📦 " + primeraPalabra + " - Cod: " + textoSku + " | $" + item.precio.toLocaleString('es-AR') + "\n";
           total += item.precio;
         });
         msj += "\n";
       }
       
-      msj += `*Total estimado:* $${total.toLocaleString('es-AR')}\n\n¿Tienen envío a...?`;
+      msj += "*Total estimado:* $" + total.toLocaleString('es-AR') + "\n\n¿Tienen envío a...?";
       let linkWsp = "https://wa.me/5493885122621?text=" + encodeURIComponent(msj);
       window.open(linkWsp, '_blank');
     }
 
-    // El parámetro animar controla si los productos entran cayendo (al buscar/cargar) o no (al dar clic al carrito)
     function renderizarPantalla(animar = true) {
       const contenedor = document.getElementById('contenedor-catalogo');
       const menuCategorias = document.getElementById('lista-categorias');
@@ -227,7 +252,7 @@
       let htmlFinal = "";
       let htmlMenu = "";
       const categoriasOrdenadas = Object.keys(catalogoAgrupado).sort();
-      let delayIndex = 0; // Para hacer el efecto escalera en la animación
+      let delayIndex = 0; 
 
       categoriasOrdenadas.forEach(categoria => {
         let catId = String(categoria).replace(/[^a-zA-Z0-9]/g, "");
@@ -265,10 +290,23 @@
               let msjIndividualPrecio = "";
               
               if(pOferta > 0) {
-                htmlPrecio = `<span class="text-red-500 line-through text-[10px] md:text-xs font-bold mr-1 opacity-80">$${pNormal.toLocaleString('es-AR')}</span><span class="text-green-600 font-black text-[15px] md:text-xl tracking-tight drop-shadow-sm">$${pOferta.toLocaleString('es-AR')}</span>`;
-                msjIndividualPrecio = `🔥 *OFERTA!* Precio normal $${pNormal} rebajado a *$${pOferta}*`;
+                htmlPrecio = `
+                  <div class="flex flex-col w-full mt-1">
+                    <span class="text-[9px] md:text-[10px] font-black text-red-600 bg-red-100 rounded-md px-1.5 py-0.5 mb-1 w-fit latido-suave border border-red-200 shadow-sm">
+                      ⏳ POR TIEMPO LIMITADO 👇
+                    </span>
+                    <div class="flex items-baseline gap-1.5">
+                      <span class="text-red-500 line-through text-[10px] md:text-xs font-bold opacity-80">$${pNormal.toLocaleString('es-AR')}</span> <span class="text-green-600 font-black text-[15px] md:text-xl tracking-tight drop-shadow-sm">$${pOferta.toLocaleString('es-AR')}</span>
+                    </div>
+                  </div>
+                `;
+                msjIndividualPrecio = `🔥 *OFERTA POR TIEMPO LIMITADO!*\nPrecio normal $${pNormal} rebajado a *$${pOferta}*`;
               } else {
-                htmlPrecio = `<span class="text-gray-900 font-black text-[15px] md:text-xl tracking-tight drop-shadow-sm">$${pNormal.toLocaleString('es-AR')}</span>`;
+                htmlPrecio = `
+                  <div class="flex items-baseline gap-1.5 pt-4">
+                    <span class="text-gray-900 font-black text-[15px] md:text-xl tracking-tight drop-shadow-sm">$${pNormal.toLocaleString('es-AR')}</span>
+                  </div>
+                `;
                 msjIndividualPrecio = `*Precio:* $${pNormal}`;
               }
 
@@ -276,7 +314,7 @@
               if(prod.enlaceRef && prod.enlaceRef.trim() !== "") {
                 let urlLimpia = prod.enlaceRef.trim();
                 if(!urlLimpia.startsWith("http")) urlLimpia = "https://" + urlLimpia;
-                htmlEnlaceRef = `<a href="${urlLimpia}" target="_blank" class="inline-block text-[9px] md:text-xs font-black text-pink-600 bg-pink-100 hover:bg-pink-200 px-2 py-0.5 rounded-md mb-1 border border-pink-200 transition-colors w-fit shadow-sm">🔗 WEB</a>`;
+                htmlEnlaceRef = `<a href="${urlLimpia}" target="_blank" class="inline-block text-[9px] md:text-xs font-black text-pink-600 bg-pink-100 hover:bg-pink-200 px-2 py-0.5 rounded-md mb-1 border border-pink-200 transition-colors w-fit shadow-sm">🔗 Referencia</a>`;
               }
 
               let opacidad = (objEstado.clave === "VENDIDO") ? "opacity-60 grayscale" : "";
@@ -304,7 +342,6 @@
                 htmlBotones = `<div class="text-center w-full bg-gray-200 text-gray-400 font-black text-[10px] md:text-xs py-2.5 rounded-md cursor-not-allowed uppercase tracking-wider">No Disponible</div>`;
               }
 
-              // Estilo de tarjeta creativa con hover y animación
               let clasesAnimacion = animar ? `card-animada` : ``;
               let delayAnim = animar ? `style="animation-delay: ${delayIndex * 40}ms;"` : ``;
               delayIndex++;
@@ -318,7 +355,6 @@
                   </div>
 
                   <div class="p-2 md:p-3 flex-grow bg-gradient-to-b from-white to-gray-50 flex flex-col">
-                    
                     <div class="flex justify-between items-center mb-1">
                       <p class="text-[9px] md:text-[10px] font-black text-pink-600 bg-pink-100 border border-pink-200 px-1.5 py-0.5 rounded uppercase tracking-wider truncate max-w-[55%]">${prod.marca}</p>
                       <span class="text-[9px] md:text-[10px] font-black text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 truncate max-w-[40%] text-right tracking-wider">#${prod.sku}</span>
@@ -329,9 +365,9 @@
                     <button onclick="const desc = this.nextElementSibling; desc.classList.toggle('hidden'); this.innerText = desc.classList.contains('hidden') ? '+ Info Técnica' : '- Ocultar Info';" class="text-left text-[10px] font-bold text-gray-500 hover:text-pink-600 mb-1 outline-none transition-colors w-fit">+ Info Técnica</button>
                     <div class="hidden text-gray-600 text-[10px] mb-2 bg-white p-2 rounded-md border border-gray-200 shadow-inner whitespace-pre-line leading-relaxed">${prod.descripcion}</div>
                     
-                    <div class="mt-auto pt-2 flex flex-col items-start border-t border-gray-100">
+                    <div class="mt-auto pt-2 flex flex-col items-start border-t border-gray-100 w-full">
                       ${htmlEnlaceRef}
-                      <div class="flex items-end mt-1 w-full justify-between">${htmlPrecio}</div>
+                      ${htmlPrecio}
                     </div>
                   </div>
 
