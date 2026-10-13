@@ -8,40 +8,79 @@
     html { scroll-behavior: smooth; }
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Animación del Carrito */
     .bounce-in { animation: bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     @keyframes bounce { 0% { transform: scale(0); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    
+    /* Efecto "Latido" para el número de teléfono */
+    .latido-suave { animation: pulse 2s infinite; }
+    
+    /* Animación de entrada en Cascada para los productos */
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .card-animada {
+      animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0; /* Inician invisibles hasta que la animación corre */
+    }
+    
+    /* Fondo con patrón sutil en el header */
+    .bg-patron {
+      background-image: radial-gradient(#ec4899 1px, transparent 1px);
+      background-size: 20px 20px;
+      background-position: -19px -19px;
+    }
   </style>
 </head>
-<body class="bg-gray-100 font-sans pb-24"> 
+<body class="bg-gray-50 font-sans pb-24"> 
 
-  <header class="bg-gray-900 text-white text-center p-4 md:p-6 shadow-md">
-    <h1 class="text-xl md:text-3xl font-black uppercase tracking-widest text-pink-500">SOY RUTH <span class="text-white">NOVEDADES</span></h1>
-    <p class="text-[10px] md:text-sm mt-1 text-gray-300">Los mejores productos CALIDAD-PRECIO • Envíos a todo el país</p>
+  <!-- ENCABEZADO CREATIVO -->
+  <header class="bg-gray-900 text-white text-center p-5 md:p-8 shadow-2xl relative overflow-hidden">
+    <!-- Patrón de fondo decorativo -->
+    <div class="absolute inset-0 bg-patron opacity-10"></div>
+    
+    <div class="relative z-10">
+      <h1 class="text-3xl md:text-5xl font-black uppercase tracking-widest text-pink-500 drop-shadow-md">
+        SOY RUTH <span class="text-white">NOVEDADES</span>
+      </h1>
+      
+      <!-- Número de Teléfono Gigante y Animado -->
+      <div class="mt-3 inline-flex items-center justify-center gap-2 bg-white/10 border border-pink-500/30 px-6 py-2 rounded-full latido-suave backdrop-blur-sm">
+        <span class="text-2xl md:text-3xl">📲</span>
+        <span class="text-xl md:text-3xl font-black text-pink-400 tracking-wider">3885122621</span>
+      </div>
+      
+      <p class="text-xs md:text-sm mt-4 text-gray-300 font-medium tracking-wide uppercase">Los mejores productos Calidad-Precio • Envíos a todo el país</p>
+    </div>
   </header>
 
   <main class="max-w-7xl mx-auto p-2 md:p-4 mt-2">
     
     <div class="mb-3 relative hidden" id="caja-buscador">
-      <input type="text" id="buscador" placeholder="🔍 Buscar producto, marca o código SKU..." 
-             class="w-full p-2 md:p-3 rounded-lg border border-gray-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none shadow-sm text-sm md:text-base transition-all">
+      <input type="text" id="buscador" placeholder="🔍 Buscar producto, marca o código..." 
+             class="w-full p-3 md:p-4 rounded-xl border border-gray-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none shadow-sm text-sm md:text-base transition-all bg-white/80 backdrop-blur-sm">
     </div>
 
-    <div id="cargando" class="text-center text-gray-500 font-semibold text-sm py-10 animate-pulse">
-      Cargando novedades...
+    <div id="cargando" class="text-center text-pink-600 font-black text-lg py-12 animate-pulse flex flex-col items-center gap-3">
+      <span class="text-4xl">🛍️</span>
+      Cargando el mejor catálogo...
     </div>
     
     <div class="flex flex-col md:flex-row-reverse gap-4 hidden" id="contenido-principal">
       
+      <!-- MENÚ DE CATEGORÍAS -->
       <aside class="w-full md:w-1/4 z-10 sticky top-2 md:top-4">
-        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-          <h3 class="hidden md:block text-lg font-bold text-gray-800 mb-3 uppercase border-b-2 border-pink-500 pb-1">CATEGORÍAS</h3>
+        <div class="bg-white p-3 rounded-xl shadow-lg border border-pink-100/50">
+          <h3 class="hidden md:block text-lg font-black text-gray-800 mb-3 uppercase border-b-2 border-pink-500 pb-1 tracking-wide">CATEGORÍAS</h3>
           
-          <button onclick="const menu = document.getElementById('lista-categorias'); menu.classList.toggle('hidden'); menu.classList.toggle('flex');" class="md:hidden w-full flex justify-between items-center text-xs font-bold text-pink-600 uppercase border-b border-pink-500 pb-2 outline-none">
+          <button onclick="const menu = document.getElementById('lista-categorias'); menu.classList.toggle('hidden'); menu.classList.toggle('flex');" class="md:hidden w-full flex justify-between items-center text-sm font-black text-pink-600 uppercase border-b-2 border-pink-500 pb-2 outline-none">
             <span>📁 Filtrar por Categoría</span>
             <span>▼</span>
           </button>
 
-          <ul id="lista-categorias" class="hidden md:flex flex-col gap-1 text-xs font-semibold text-gray-600 mt-2 md:mt-0 max-h-64 overflow-y-auto md:max-h-full scrollbar-hide">
+          <ul id="lista-categorias" class="hidden md:flex flex-col gap-1 text-xs font-bold text-gray-600 mt-2 md:mt-0 max-h-64 overflow-y-auto md:max-h-full scrollbar-hide">
           </ul>
         </div>
       </aside>
@@ -54,15 +93,15 @@
   </main>
 
   <!-- CARRITO FLOTANTE -->
-  <div id="carrito-flotante" class="hidden fixed bottom-4 right-4 left-4 md:left-auto z-50 bounce-in">
-    <button onclick="enviarCarrito()" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-black text-sm md:text-base py-3 px-6 rounded-full shadow-2xl border-2 border-white flex items-center justify-center gap-2 transition-transform active:scale-95">
+  <div id="carrito-flotante" class="hidden fixed bottom-6 right-4 left-4 md:left-auto md:right-8 z-50 bounce-in">
+    <button onclick="enviarCarrito()" class="w-full md:w-auto bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-black text-base py-4 px-8 rounded-full shadow-[0_10px_25px_-5px_rgba(16,185,129,0.5)] border border-green-400 flex items-center justify-center gap-2 transition-transform active:scale-95">
       🛒 <span id="txt-carrito-flotante">Enviar Carrito (0)</span>
     </button>
   </div>
 
   <script>
     // 🔴 PEGA TU URL DE APPS SCRIPT AQUÍ 🔴
-    const urlAPI = 'https://script.google.com/macros/s/AKfycbwMDuluV49m9ThpcdHDYt-bto_WhoqSJrJ3ZNd-0qrkhHTWG7ZX-9K4KikyjK-YSaDh/exec';
+    const urlAPI = 'AQUI_PEGA_TU_URL_DE_APPS_SCRIPT';
     
     let todosLosProductos = []; 
     let productosEnPantalla = [];
@@ -125,7 +164,7 @@
       }
       
       actualizarBotonFlotante();
-      renderizarPantalla(); 
+      renderizarPantalla(false); // Pasamos 'false' para no reiniciar las animaciones al hacer clic
     }
 
     function actualizarBotonFlotante() {
@@ -134,7 +173,7 @@
       if (carrito.length > 0) {
         btnFlotante.classList.remove('hidden');
         let total = carrito.reduce((sum, item) => sum + item.precio, 0);
-        txtFlotante.innerText = `Enviar Carrito (${carrito.length}) - $${total.toLocaleString('es-AR')}`;
+        txtFlotante.innerText = `Enviar Carrito (${carrito.length}) -$${total.toLocaleString('es-AR')}`;
       } else {
         btnFlotante.classList.add('hidden');
       }
@@ -146,16 +185,15 @@
       let total = 0;
       
       if (carrito.length === 1) {
-        // Formato detallado para 1 solo producto
         let item = carrito[0];
         msj += `📦 *${item.nombre}*\n🏷️ Marca: ${item.marca} | Código: ${item.sku}\n💲 $${item.precio.toLocaleString('es-AR')}\n\n`;
         total = item.precio;
       } else {
-        // MODO AHORRO DE CARACTERES para Varios Productos (Primera Letra + SKU)
+        // MODO AHORRO: Primera Palabra + SKU
         carrito.forEach(item => {
-          let primeraLetra = item.nombre.charAt(0).toUpperCase();
+          let primeraPalabra = item.nombre.trim().split(/\s+/)[0].toUpperCase();
           let textoSku = item.sku && item.sku !== "S/N" ? item.sku : "SinCod";
-          msj += `📦 ${primeraLetra}-${textoSku} | $${item.precio.toLocaleString('es-AR')}\n`;
+          msj += `📦 ${primeraPalabra} [${textoSku}] \vert{}$${item.precio.toLocaleString('es-AR')}\n`;
           total += item.precio;
         });
         msj += "\n";
@@ -166,12 +204,13 @@
       window.open(linkWsp, '_blank');
     }
 
-    function renderizarPantalla() {
+    // El parámetro animar controla si los productos entran cayendo (al buscar/cargar) o no (al dar clic al carrito)
+    function renderizarPantalla(animar = true) {
       const contenedor = document.getElementById('contenedor-catalogo');
       const menuCategorias = document.getElementById('lista-categorias');
 
       if(productosEnPantalla.length === 0) {
-        contenedor.innerHTML = '<div class="text-center py-10 bg-white rounded-lg shadow-sm border border-gray-200"><p class="text-sm text-gray-600 font-bold mb-2">No encontramos coincidencias 😅</p></div>';
+        contenedor.innerHTML = '<div class="text-center py-10 bg-white rounded-xl shadow-lg border border-gray-200"><p class="text-sm text-gray-600 font-bold mb-2">No encontramos coincidencias 😅</p></div>';
         menuCategorias.innerHTML = '<li class="text-center text-gray-400">Sin resultados</li>';
         return;
       }
@@ -188,32 +227,33 @@
       let htmlFinal = "";
       let htmlMenu = "";
       const categoriasOrdenadas = Object.keys(catalogoAgrupado).sort();
+      let delayIndex = 0; // Para hacer el efecto escalera en la animación
 
       categoriasOrdenadas.forEach(categoria => {
         let catId = String(categoria).replace(/[^a-zA-Z0-9]/g, "");
         
         htmlMenu += `<li>
           <a href="#${catId}" onclick="if(window.innerWidth < 768) { document.getElementById('lista-categorias').classList.add('hidden'); document.getElementById('lista-categorias').classList.remove('flex'); }" 
-             class="block px-2 py-1.5 md:px-0 md:py-1 bg-pink-50 md:bg-transparent rounded md:rounded-none hover:text-pink-600 transition-colors border border-pink-100 md:border-none w-full text-left">
+             class="block px-3 py-2 md:px-2 md:py-1.5 bg-pink-50 md:bg-transparent rounded-lg md:rounded-md hover:text-pink-600 transition-colors border border-pink-100 md:border-transparent w-full text-left">
             👉 ${categoria}
           </a>
         </li>`;
         
         htmlFinal += `<div id="${catId}" class="pt-2 md:pt-4"></div>`; 
-        htmlFinal += `<h2 class="text-lg md:text-2xl font-black text-gray-800 mt-1 mb-3 border-b-2 border-pink-500 inline-block uppercase">${categoria}</h2>`;
+        htmlFinal += `<h2 class="text-xl md:text-3xl font-black text-gray-800 mt-1 mb-3 border-b-4 border-pink-500 inline-block uppercase drop-shadow-sm">${categoria}</h2>`;
         
         const ordenEstados = [
-          { clave: "DISPONIBLE", color: "text-green-600", icono: "🟢" },
-          { clave: "RESERVADO", color: "text-yellow-600", icono: "🟡" },
-          { clave: "VENDIDO", color: "text-red-600", icono: "🔴" }
+          { clave: "DISPONIBLE", color: "text-green-600", bg: "bg-green-50", icono: "🟢" },
+          { clave: "RESERVADO", color: "text-yellow-600", bg: "bg-yellow-50", icono: "🟡" },
+          { clave: "VENDIDO", color: "text-red-600", bg: "bg-red-50", icono: "🔴" }
         ];
 
         ordenEstados.forEach(objEstado => {
           const listaProd = catalogoAgrupado[categoria][objEstado.clave];
           
           if(listaProd && listaProd.length > 0) {
-            htmlFinal += `<h3 class="text-xs font-bold ${objEstado.color} mb-2 mt-1 md:ml-1 border-l-2 border-current pl-2 shadow-sm bg-white inline-block pr-2 py-0.5 rounded">${objEstado.icono} ${objEstado.clave}S</h3>`;
-            htmlFinal += `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 mb-6">`;
+            htmlFinal += `<div class="mb-2 mt-1 md:ml-1"><h3 class="text-xs font-black ${objEstado.color}${objEstado.bg} border-l-4 border-current pl-2 shadow-sm inline-block pr-3 py-1 rounded-r-lg uppercase tracking-wide">${objEstado.icono}${objEstado.clave}S</h3></div>`;
+            htmlFinal += `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5 mb-8">`;
             
             listaProd.forEach(prod => {
               let indexReal = todosLosProductos.findIndex(p => p.nombre === prod.nombre && p.descripcion === prod.descripcion);
@@ -225,10 +265,10 @@
               let msjIndividualPrecio = "";
               
               if(pOferta > 0) {
-                htmlPrecio = `<span class="text-red-500 line-through text-[10px] md:text-xs font-bold mr-1 opacity-80">$${pNormal.toLocaleString('es-AR')}</span><span class="text-green-600 font-black text-sm md:text-lg tracking-tight">$${pOferta.toLocaleString('es-AR')}</span>`;
+                htmlPrecio = `<span class="text-red-500 line-through text-[10px] md:text-xs font-bold mr-1 opacity-80">$${pNormal.toLocaleString('es-AR')}</span><span class="text-green-600 font-black text-[15px] md:text-xl tracking-tight drop-shadow-sm">$${pOferta.toLocaleString('es-AR')}</span>`;
                 msjIndividualPrecio = `🔥 *OFERTA!* Precio normal $${pNormal} rebajado a *$${pOferta}*`;
               } else {
-                htmlPrecio = `<span class="text-gray-900 font-black text-sm md:text-lg tracking-tight">$${pNormal.toLocaleString('es-AR')}</span>`;
+                htmlPrecio = `<span class="text-gray-900 font-black text-[15px] md:text-xl tracking-tight drop-shadow-sm">$${pNormal.toLocaleString('es-AR')}</span>`;
                 msjIndividualPrecio = `*Precio:* $${pNormal}`;
               }
 
@@ -236,7 +276,7 @@
               if(prod.enlaceRef && prod.enlaceRef.trim() !== "") {
                 let urlLimpia = prod.enlaceRef.trim();
                 if(!urlLimpia.startsWith("http")) urlLimpia = "https://" + urlLimpia;
-                htmlEnlaceRef = `<a href="${urlLimpia}" target="_blank" class="inline-block text-[9px] md:text-xs font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full mb-1 border border-pink-100 w-fit">🔗 Ref. Web</a>`;
+                htmlEnlaceRef = `<a href="${urlLimpia}" target="_blank" class="inline-block text-[9px] md:text-xs font-black text-pink-600 bg-pink-100 hover:bg-pink-200 px-2 py-0.5 rounded-md mb-1 border border-pink-200 transition-colors w-fit shadow-sm">🔗 WEB</a>`;
               }
 
               let opacidad = (objEstado.clave === "VENDIDO") ? "opacity-60 grayscale" : "";
@@ -246,8 +286,8 @@
               if (esDisponible) {
                 if (estaEnCarrito) {
                   htmlBotones = `
-                    <button onclick="toggleCarrito(${indexReal})" class="w-full text-xs font-bold text-gray-500 bg-gray-100 py-1 mb-1 rounded hover:bg-gray-200">❌ Quitar</button>
-                    <button onclick="enviarCarrito()" class="w-full bg-green-500 text-white font-bold text-[10px] md:text-xs py-2 rounded shadow-sm flex items-center justify-center gap-1 animate-pulse">
+                    <button onclick="toggleCarrito(${indexReal})" class="w-full text-xs font-bold text-gray-500 bg-gray-100 py-1 mb-1 rounded hover:bg-gray-200 transition-colors border border-gray-200">❌ Quitar del carrito</button>
+                    <button onclick="enviarCarrito()" class="w-full bg-green-500 hover:bg-green-600 text-white font-black text-[10px] md:text-xs py-2 rounded shadow-md flex items-center justify-center gap-1 transition-colors">
                       ✅ COMPRAR CARRITO
                     </button>
                   `;
@@ -256,42 +296,46 @@
                   let linkWspSolo = "https://wa.me/5493885122621?text=" + msjWspSolo; 
                   
                   htmlBotones = `
-                    <button onclick="toggleCarrito(${indexReal})" class="w-full text-[10px] md:text-xs font-bold text-pink-600 bg-pink-50 border border-pink-200 py-1 mb-1 rounded hover:bg-pink-100 transition-colors">🛒 Seleccionar</button>
-                    <a href="${linkWspSolo}" target="_blank" class="block text-center w-full bg-gray-800 text-white font-bold text-[10px] md:text-xs py-2 rounded shadow-sm hover:bg-gray-900 transition-colors">Comprar solo este</a>
+                    <button onclick="toggleCarrito(${indexReal})" class="w-full text-[10px] md:text-xs font-black text-pink-600 bg-pink-50 border border-pink-200 py-1.5 mb-1.5 rounded-md hover:bg-pink-100 transition-colors shadow-sm">🛒 AGREGAR</button>
+                    <a href="${linkWspSolo}" target="_blank" class="block text-center w-full bg-gray-900 text-white font-bold text-[10px] md:text-xs py-1.5 rounded-md shadow-sm hover:bg-black transition-colors">Comprar solo este</a>
                   `;
                 }
               } else {
-                htmlBotones = `<div class="text-center w-full bg-gray-300 text-gray-500 font-bold text-[10px] py-2 rounded cursor-not-allowed">No Disponible</div>`;
+                htmlBotones = `<div class="text-center w-full bg-gray-200 text-gray-400 font-black text-[10px] md:text-xs py-2.5 rounded-md cursor-not-allowed uppercase tracking-wider">No Disponible</div>`;
               }
 
+              // Estilo de tarjeta creativa con hover y animación
+              let clasesAnimacion = animar ? `card-animada` : ``;
+              let delayAnim = animar ? `style="animation-delay: ${delayIndex * 40}ms;"` : ``;
+              delayIndex++;
+
               htmlFinal += `
-                <div class="bg-white rounded-lg shadow border border-gray-200 flex flex-col justify-between overflow-hidden transition-all hover:shadow-md ${opacidad} ${estaEnCarrito ? 'ring-2 ring-green-400' : ''}">
+                <div ${delayAnim} class="${clasesAnimacion} bg-white rounded-xl shadow-md border border-gray-100 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_20px_-10px_rgba(236,72,153,0.4)] ${opacidad} ${estaEnCarrito ? 'ring-2 ring-green-400 ring-offset-1' : ''}">
                   
-                  <div class="h-28 md:h-36 bg-white flex items-center justify-center overflow-hidden relative border-b border-gray-100 p-1">
-                    ${prod.foto ? `<img src="${prod.foto}" alt="${prod.nombre}" class="w-full h-full object-contain rounded">` : `<span class="text-gray-300 text-2xl">📸</span>`}
-                    <div class="absolute top-1 right-1 bg-gray-900/80 backdrop-blur-sm text-white text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded shadow">Stock: ${prod.stock}</div>
+                  <div class="h-32 md:h-40 bg-white flex items-center justify-center overflow-hidden relative border-b border-gray-50 p-2">
+                    ${prod.foto ? `<img src="${prod.foto}" alt="${prod.nombre}" class="w-full h-full object-contain rounded drop-shadow-sm transition-transform duration-500 hover:scale-110">` : `<span class="text-gray-200 text-4xl">📸</span>`}
+                    <div class="absolute top-1.5 right-1.5 bg-gray-900/80 backdrop-blur-md text-white text-[9px] md:text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg border border-gray-700 tracking-wide">STOCK: ${prod.stock}</div>
                   </div>
 
-                  <div class="p-2 flex-grow bg-gray-50/30 flex flex-col">
+                  <div class="p-2 md:p-3 flex-grow bg-gradient-to-b from-white to-gray-50 flex flex-col">
                     
-                    <!-- MARCA A LA IZQUIERDA Y SKU A LA DERECHA -->
-                    <div class="flex justify-between items-center mb-0.5">
-                      <p class="text-[9px] md:text-[10px] font-bold text-pink-700 bg-pink-50 border border-pink-100 px-1 rounded uppercase tracking-wide truncate max-w-[60%]">${prod.marca}</p>
-                      <span class="text-[9px] md:text-[10px] font-bold text-gray-400 truncate max-w-[35%] text-right">#${prod.sku}</span>
+                    <div class="flex justify-between items-center mb-1">
+                      <p class="text-[9px] md:text-[10px] font-black text-pink-600 bg-pink-100 border border-pink-200 px-1.5 py-0.5 rounded uppercase tracking-wider truncate max-w-[55%]">${prod.marca}</p>
+                      <span class="text-[9px] md:text-[10px] font-black text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 truncate max-w-[40%] text-right tracking-wider">#${prod.sku}</span>
                     </div>
 
-                    <h2 class="text-xs md:text-sm font-bold text-gray-800 leading-tight mb-1 line-clamp-2 h-8 md:h-10">${prod.nombre}</h2>
+                    <h2 class="text-xs md:text-sm font-black text-gray-800 leading-snug mb-1 line-clamp-2 h-8 md:h-10 mt-1">${prod.nombre}</h2>
                     
-                    <button onclick="const desc = this.nextElementSibling; desc.classList.toggle('hidden'); this.innerText = desc.classList.contains('hidden') ? '+ Info' : '- Info';" class="text-left text-[10px] font-bold text-gray-500 mb-1 outline-none underline">+ Info</button>
-                    <div class="hidden text-gray-600 text-[10px] mb-2 bg-white p-1.5 rounded border border-gray-200 shadow-inner whitespace-pre-line leading-snug">${prod.descripcion}</div>
+                    <button onclick="const desc = this.nextElementSibling; desc.classList.toggle('hidden'); this.innerText = desc.classList.contains('hidden') ? '+ Info Técnica' : '- Ocultar Info';" class="text-left text-[10px] font-bold text-gray-500 hover:text-pink-600 mb-1 outline-none transition-colors w-fit">+ Info Técnica</button>
+                    <div class="hidden text-gray-600 text-[10px] mb-2 bg-white p-2 rounded-md border border-gray-200 shadow-inner whitespace-pre-line leading-relaxed">${prod.descripcion}</div>
                     
-                    <div class="mt-auto pt-1 flex flex-col">
+                    <div class="mt-auto pt-2 flex flex-col items-start border-t border-gray-100">
                       ${htmlEnlaceRef}
-                      <div class="flex items-end">${htmlPrecio}</div>
+                      <div class="flex items-end mt-1 w-full justify-between">${htmlPrecio}</div>
                     </div>
                   </div>
 
-                  <div class="bg-white p-2 border-t border-gray-100">
+                  <div class="bg-white p-2 md:p-3 border-t border-gray-100">
                     ${htmlBotones}
                   </div>
                 </div>
